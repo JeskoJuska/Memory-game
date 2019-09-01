@@ -24,25 +24,42 @@ function animatePress(color) {
 }
 
 
-$(document).keydown(function() {
+$(document).keydown(function(event) {
   if (startGame) {} else {
     startGame = true;
+    console.log(event);
     nextSequence();
   }
 });
 
-function wrongColor(){
+function startOver(){
   gamePattern = [];
   level = 0;
-  console.log("wrong");
+  startGame = false;
+}
+
+function wrongColor(){
+  var audio = new Audio("sounds/wrong.mp3");
+  audio.play();
+
+  $("body").addClass("game-over");
+  setTimeout(function () {
+      $("body").removeClass("game-over");
+  }, 200);
+
+  $("h1").text("Game Over, Press Any Key to Restart");
+
+  startOver();
 }
 
 
 function nextSequence() {
+  userClickedPattern = [];
+
   var randomNumber = Math.floor(Math.random() * 4);
   gamePattern.push(buttonColors[randomNumber]);
 
-  $("h1").text("level " + level++);
+  $("h1").text("level " + ++level);
 
 
   $("#" + buttonColors[randomNumber]).fadeOut(100).fadeIn(100);
@@ -65,10 +82,9 @@ $(".btn").click(function() {
   if (userChosenColor != gamePattern[userClickedPattern.length]) {wrongColor();}
   else {
     userClickedPattern.push(userChosenColor);
+      if (userClickedPattern.length === gamePattern.length) setTimeout(function () {
+        nextSequence();
+      }, 1000);
   }
 
-  if (userClickedPattern.length === gamePattern.length) setTimeout(function () {
-    userClickedPattern = [];
-    nextSequence();
-  }, 1000);
 });
